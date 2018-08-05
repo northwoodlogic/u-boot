@@ -138,6 +138,11 @@
  * Even with the smallest possible CPU-GPU memory split of the CPU getting
  * only 64M, the remaining 25M starting at 0x02700000 should allow quite
  * large initrds before they start colliding with U-Boot.
+ *
+ * The location of fit_addr_r is a balancing act. It's parked about 260MB in
+ * from the beginning of memory. It needs to be high enough as to not collide
+ * with the kernel & initrd locations. The DTBs are used in-place so it needs
+ * to be low enough to still fit in the lowmem range.
  */
 #define ENV_MEM_LAYOUT_SETTINGS \
 	"fdt_high=" FDT_HIGH "\0" \
@@ -146,6 +151,7 @@
 	"scriptaddr=0x02400000\0" \
 	"pxefile_addr_r=0x02500000\0" \
 	"fdt_addr_r=0x02600000\0" \
+	"fit_addr_r=0x10000000\0" \
 	"ramdisk_addr_r=0x02700000\0"
 
 #define BOOT_TARGET_DEVICES(func) \
@@ -156,7 +162,18 @@
 #include <config_distro_bootcmd.h>
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"dhcpuboot=usb start; dhcp u-boot.uimg; bootm\0" \
+	"autoload=no\0" \
+	"bootargs=console=ttyAMA0,115200 earlyprintk\0" \
+	"fit_file=raspberrypi.itb\0" \
+	"fit_bootcmd=" \
+		"fatload mmc 0 ${fit_addr_r} ${fit_file} && bootm ${fit_addr_r}#${fit_conf}; " \
+		"echo MMC primary boot failed. Trying recovery image...; " \
+		"fatload mmc 0 ${fit_addr_r} recovery-${fit_file} && bootm ${fit_addr_r}#${fit_conf}; " \
+		"echo MMC recovery boot failed. Trying network...; " \
+		"dhcp && tftp ${fit_addr_r} ${fit_file} && bootm ${fit_addr_r}#${fit_conf}; " \
+		"echo Network boot failed. Retrying in 30 seconds...; " \
+		"sleep 30; " \
+		"reset; \0"\
 	ENV_DEVICE_SETTINGS \
 	ENV_MEM_LAYOUT_SETTINGS \
 	BOOTENV

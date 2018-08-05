@@ -81,12 +81,14 @@ struct msg_get_clock_rate {
 struct rpi_model {
 	const char *name;
 	const char *fdtfile;
+	const char *fit_conf;
 	bool has_onboard_eth;
 };
 
 static const struct rpi_model rpi_model_unknown = {
 	"Unknown model",
 	DTB_DIR "bcm283x-rpi-other.dtb",
+	"other",
 	false,
 };
 
@@ -94,56 +96,67 @@ static const struct rpi_model rpi_models_new_scheme[] = {
 	[0x0] = {
 		"Model A",
 		DTB_DIR "bcm2835-rpi-a.dtb",
+		"a",
 		false,
 	},
 	[0x1] = {
 		"Model B",
 		DTB_DIR "bcm2835-rpi-b.dtb",
+		"b",
 		true,
 	},
 	[0x2] = {
 		"Model A+",
 		DTB_DIR "bcm2835-rpi-a-plus.dtb",
+		"a-plus",
 		false,
 	},
 	[0x3] = {
 		"Model B+",
 		DTB_DIR "bcm2835-rpi-b-plus.dtb",
+		"b-plus",
 		true,
 	},
 	[0x4] = {
 		"2 Model B",
 		DTB_DIR "bcm2836-rpi-2-b.dtb",
+		"2-b",
 		true,
 	},
 	[0x6] = {
 		"Compute Module",
 		DTB_DIR "bcm2835-rpi-cm.dtb",
+		"cm",
 		false,
 	},
 	[0x8] = {
 		"3 Model B",
 		DTB_DIR "bcm2837-rpi-3-b.dtb",
+		"3-b",
 		true,
 	},
 	[0x9] = {
 		"Zero",
 		DTB_DIR "bcm2835-rpi-zero.dtb",
+		"zero",
 		false,
 	},
 	[0xA] = {
 		"Compute Module 3",
 		DTB_DIR "bcm2837-rpi-cm3.dtb",
+		"cm3",
 		false,
 	},
 	[0xC] = {
 		"Zero W",
 		DTB_DIR "bcm2835-rpi-zero-w.dtb",
+		"zero-w",
 		false,
 	},
 	[0xD] = {
 		"3 Model B+",
 		DTB_DIR "bcm2837-rpi-3-b-plus.dtb",
+		"3-b-plus",
 		true,
 	},
 };
@@ -152,86 +165,103 @@ static const struct rpi_model rpi_models_old_scheme[] = {
 	[0x2] = {
 		"Model B",
 		DTB_DIR "bcm2835-rpi-b.dtb",
+		"b",
 		true,
 	},
 	[0x3] = {
 		"Model B",
 		DTB_DIR "bcm2835-rpi-b.dtb",
+		"b",
 		true,
 	},
 	[0x4] = {
 		"Model B rev2",
 		DTB_DIR "bcm2835-rpi-b-rev2.dtb",
+		"b-rev2",
 		true,
 	},
 	[0x5] = {
 		"Model B rev2",
 		DTB_DIR "bcm2835-rpi-b-rev2.dtb",
+		"b-rev2",
 		true,
 	},
 	[0x6] = {
 		"Model B rev2",
 		DTB_DIR "bcm2835-rpi-b-rev2.dtb",
+		"b-rev2",
 		true,
 	},
 	[0x7] = {
 		"Model A",
 		DTB_DIR "bcm2835-rpi-a.dtb",
+		"a",
 		false,
 	},
 	[0x8] = {
 		"Model A",
 		DTB_DIR "bcm2835-rpi-a.dtb",
+		"a",
 		false,
 	},
 	[0x9] = {
 		"Model A",
 		DTB_DIR "bcm2835-rpi-a.dtb",
+		"a",
 		false,
 	},
 	[0xd] = {
 		"Model B rev2",
 		DTB_DIR "bcm2835-rpi-b-rev2.dtb",
+		"b-rev2",
 		true,
 	},
 	[0xe] = {
 		"Model B rev2",
 		DTB_DIR "bcm2835-rpi-b-rev2.dtb",
+		"b-rev2",
 		true,
 	},
 	[0xf] = {
 		"Model B rev2",
 		DTB_DIR "bcm2835-rpi-b-rev2.dtb",
+		"b-rev2",
 		true,
 	},
 	[0x10] = {
 		"Model B+",
 		DTB_DIR "bcm2835-rpi-b-plus.dtb",
+		"b-plus",
 		true,
 	},
 	[0x11] = {
 		"Compute Module",
 		DTB_DIR "bcm2835-rpi-cm.dtb",
+		"cm",
 		false,
 	},
 	[0x12] = {
 		"Model A+",
 		DTB_DIR "bcm2835-rpi-a-plus.dtb",
+		"a-plus",
 		false,
 	},
 	[0x13] = {
 		"Model B+",
 		DTB_DIR "bcm2835-rpi-b-plus.dtb",
+		"b-plus",
 		true,
 	},
 	[0x14] = {
 		"Compute Module",
 		DTB_DIR "bcm2835-rpi-cm.dtb",
+		"cm",
 		false,
 	},
 	[0x15] = {
 		"Model A+",
 		DTB_DIR "bcm2835-rpi-a-plus.dtb",
+		"a-plus",
 		false,
 	},
 };
@@ -293,6 +323,17 @@ static void set_fdtfile(void)
 
 	fdtfile = model->fdtfile;
 	env_set("fdtfile", fdtfile);
+}
+
+static void set_fit_conf(void)
+{
+	const char *fit_conf;
+
+	if (env_get("fit_conf"))
+		return;
+
+	fit_conf = model->fit_conf;
+	env_set("fit_conf", fit_conf);
 }
 
 /*
@@ -391,6 +432,7 @@ static void set_serial_number(void)
 
 int misc_init_r(void)
 {
+	set_fit_conf();
 	set_fdt_addr();
 	set_fdtfile();
 	set_usbethaddr();
