@@ -678,6 +678,7 @@ libs-y += lib/
 libs-$(HAVE_VENDOR_COMMON_LIB) += board/$(VENDOR)/common/
 libs-$(CONFIG_OF_EMBED) += dts/
 libs-y += fs/
+libs-y += lwip/src/
 libs-y += net/
 libs-y += disk/
 libs-y += drivers/

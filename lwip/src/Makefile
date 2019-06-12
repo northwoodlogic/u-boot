@@ -37,3 +37,17 @@ obj-y += core/ipv4/ip4_frag.o
 obj-y += core/ipv4/ip4.o
 obj-y += core/ipv4/ip4_addr.o
 
+# CORE6FILES
+obj-y += core/ipv6/dhcp6.o
+obj-y += core/ipv6/ethip6.o
+obj-y += core/ipv6/icmp6.o
+obj-y += core/ipv6/inet6.o
+obj-y += core/ipv6/ip6.o
+obj-y += core/ipv6/ip6_addr.o
+obj-y += core/ipv6/ip6_frag.o
+obj-y += core/ipv6/mld6.o
+obj-y += core/ipv6/nd6.o
+
+# The porting goop to make things run on top of U-Boot
+obj-y += include/arch/sys_arch.o
+obj-y += include/arch/ubootif.o

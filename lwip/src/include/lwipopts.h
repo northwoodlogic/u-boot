@@ -19,4 +19,8 @@
 // We've only got one thread and one context
 #define SYS_LIGHTWEIGHT_PROT 0
 
+// Dual stack
+#define LWIP_IPV4 1
+#define LWIP_IPV6 1
+
 #endif

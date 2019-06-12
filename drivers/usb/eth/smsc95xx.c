@@ -439,8 +439,10 @@ static int smsc95xx_set_csums(struct usb_device *udev, int use_tx_csum,
 
 static void smsc95xx_set_multicast(struct smsc95xx_private *priv)
 {
-	/* No multicast in u-boot */
-	priv->mac_cr &= ~(MAC_CR_PRMS_ | MAC_CR_MCPAS_ | MAC_CR_HPFILT_);
+	/* clear promiscious & make perfect hashing (the default)  */
+	priv->mac_cr &= ~(MAC_CR_PRMS_ | MAC_CR_HPFILT_);
+	/* pass all multicast (needed for IPv6) */
+	priv->mac_cr |= MAC_CR_MCPAS_;
 }
 
 /* starts the TX path */
