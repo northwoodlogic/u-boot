@@ -57,6 +57,9 @@
 #define CONFIG_SYS_MEMTEST_END		0x00200000
 #define CONFIG_LOADADDR			0x00200000
 
+/* Default is 8MB, FreeBSD Kernel + rootfs linked in is larger */
+#define CONFIG_SYS_BOOTM_LEN		(64 << 20)
+
 /* Devices */
 /* GPIO */
 #define CONFIG_BCM2835_GPIO
